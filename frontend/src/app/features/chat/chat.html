@@ -1,0 +1,113 @@
+<div class="chat-layout">
+
+  <!-- Toast de notificación -->
+  @if (toast()) {
+    <div class="chat-toast" (click)="toast.set(null)">{{ toast() }}</div>
+  }
+
+  <!-- Sidebar: lista de conversaciones -->
+  <aside class="chat-sidebar">
+    <div class="chat-sidebar__header">
+      <h2 class="chat-sidebar__title">Chats</h2>
+    </div>
+
+    @if (loadingConversations()) {
+      <p class="chat-sidebar__empty text-muted">Cargando...</p>
+    } @else if (conversations().length === 0) {
+      <p class="chat-sidebar__empty text-muted">Sin conversaciones</p>
+    } @else {
+      <ul class="chat-sidebar__list">
+        @for (conv of conversations(); track conv.id) {
+          <li
+            class="chat-conv-item"
+            [class.chat-conv-item--active]="activeConversation()?.id === conv.id"
+            (click)="selectConversation(conv)"
+          >
+            <div class="chat-conv-item__avatar">
+              {{ conversationLabel(conv).charAt(0).toUpperCase() }}
+            </div>
+            <div class="chat-conv-item__info">
+              <span class="chat-conv-item__name">{{ conversationLabel(conv) }}</span>
+            </div>
+            @if (unreadCount(conv) > 0) {
+              <span class="chat-conv-item__badge">{{ unreadCount(conv) }}</span>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </aside>
+
+  <!-- Hilo de mensajes -->
+  <section class="chat-thread">
+    @if (!activeConversation()) {
+      <div class="chat-thread__empty">
+        <p class="text-muted">Seleccioná una conversación para comenzar</p>
+      </div>
+    } @else {
+      <header class="chat-thread__header">
+        <span class="chat-thread__peer">{{ peerName() }}</span>
+      </header>
+
+      <div class="chat-thread__messages">
+        @if (loadingMessages()) {
+          <p class="text-muted" style="text-align:center;padding:1rem">Cargando mensajes...</p>
+        } @else if (messages().length === 0) {
+          <p class="text-muted" style="text-align:center;padding:1rem">
+            Sin mensajes aún. ¡Empezá la conversación!
+          </p>
+        }
+
+        @for (msg of messages(); track msg.id) {
+          <div class="chat-bubble-wrap" [class.chat-bubble-wrap--mine]="isMine(msg)">
+            <div class="chat-bubble" [class.chat-bubble--mine]="isMine(msg)">
+              <p class="chat-bubble__text">{{ msg.content }}</p>
+              <span class="chat-bubble__meta">
+                {{ msg.createdAt | date:'HH:mm' }}
+                @if (isMine(msg) && msg.readAt) {
+                  <span class="chat-bubble__read" title="Leído"> ✓✓</span>
+                }
+              </span>
+            </div>
+          </div>
+        }
+
+        @if (isTyping()) {
+          <div class="chat-bubble-wrap">
+            <div class="chat-bubble chat-bubble--typing">
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+            </div>
+          </div>
+        }
+
+        <div #messagesEnd></div>
+      </div>
+
+      <footer class="chat-thread__input">
+        @if (error()) {
+          <p class="text-error" style="padding:0.5rem 1rem">{{ error() }}</p>
+        }
+        <div class="chat-input-row">
+          <textarea
+            class="chat-input"
+            [(ngModel)]="newMessage"
+            placeholder="Escribí un mensaje..."
+            rows="1"
+            (input)="onInput()"
+            (keydown)="onKeydown($event)"
+          ></textarea>
+          <button
+            class="btn btn--primary chat-send-btn"
+            [disabled]="!newMessage.trim()"
+            (click)="send()"
+          >
+            Enviar
+          </button>
+        </div>
+      </footer>
+    }
+  </section>
+
+</div>

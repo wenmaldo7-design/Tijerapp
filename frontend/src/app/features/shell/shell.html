@@ -1,0 +1,50 @@
+<nav class="navbar">
+
+  <a routerLink="/dashboard" class="navbar__brand">
+    <span class="navbar__brand-icon">✂</span>
+    <span class="navbar__brand-name">TIJERAPP</span>
+  </a>
+
+  <ul class="navbar__nav">
+    <li>
+      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        Dashboard
+      </a>
+    </li>
+    <li>
+      <a routerLink="/appointments" routerLinkActive="active">Mis Turnos</a>
+    </li>
+    <li>
+      <a routerLink="/book" routerLinkActive="active">Reservar</a>
+    </li>
+    <li class="navbar__nav-item--rel">
+      <a routerLink="/chat" routerLinkActive="active">
+        Chat
+        @if (unreadTotal() > 0) {
+          <span class="navbar__badge">{{ unreadTotal() > 99 ? '99+' : unreadTotal() }}</span>
+        }
+      </a>
+    </li>
+    @if (auth.hasRole('STAFF', 'ADMIN')) {
+      <li>
+        <a routerLink="/staff" routerLinkActive="active">Agenda</a>
+      </li>
+    }
+    @if (auth.hasRole('ADMIN')) {
+      <li>
+        <a routerLink="/admin" routerLinkActive="active">Admin</a>
+      </li>
+    }
+  </ul>
+
+  <div class="navbar__user">
+    <span class="navbar__email text-muted">{{ auth.currentUser()?.email }}</span>
+    <span [class]="roleBadgeClass()">{{ auth.currentRole() }}</span>
+    <button class="btn btn--danger" (click)="logout()">Salir</button>
+  </div>
+
+</nav>
+
+<main class="shell-main">
+  <router-outlet />
+</main>

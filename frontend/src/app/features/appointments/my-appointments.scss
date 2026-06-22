@@ -1,0 +1,132 @@
+.my-appts {
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  &__section {
+    margin-bottom: 2.5rem;
+  }
+
+  &__section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    &--past .my-appts__card { opacity: 0.65; }
+  }
+
+  &__card {
+    padding: 1.25rem 1.5rem;
+    transition: opacity var(--t);
+
+    &--past { pointer-events: none; }
+  }
+
+  &__card-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__time-block {
+    display: flex;
+    flex-direction: column;
+    min-width: 4rem;
+    flex-shrink: 0;
+  }
+
+  &__time {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  &__date {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  &__details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  &__service-name {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  &__staff {
+    font-size: 0.875rem;
+  }
+
+  &__meta {
+    font-size: 0.8125rem;
+    margin-top: 0.2rem;
+  }
+
+  &__card-aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  &__notes {
+    font-size: 0.8125rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  // ── Empty state ──
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 3rem 1rem;
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+
+    p { margin: 0; }
+  }
+
+  &__empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+// Status badge overrides for CANCELLED/COMPLETED
+.badge--admin  { background: rgba(224, 85, 85, 0.12); color: var(--error); }
+.badge--done   { background: rgba(120, 120, 120, 0.12); color: var(--text-muted); }
+
+.alert { margin-bottom: 1.5rem; }

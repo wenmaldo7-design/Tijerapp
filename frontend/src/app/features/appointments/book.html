@@ -1,0 +1,217 @@
+<div class="page book">
+
+  <header class="book__header">
+    <h1>Reservar turno</h1>
+    <p class="text-muted">Seguí los pasos para elegir tu servicio y horario</p>
+  </header>
+
+  <!-- Breadcrumb de pasos -->
+  <div class="book__steps">
+    <button class="book__step"
+      [class.active]="step() === 'service'"
+      [class.done]="currentStepIndex() > 0"
+      [disabled]="currentStepIndex() === 0"
+      (click)="goToStep('service')">
+      <span class="book__step-num">1</span> Servicio
+    </button>
+    <span class="book__step-sep"></span>
+    <button class="book__step"
+      [class.active]="step() === 'staff'"
+      [class.done]="currentStepIndex() > 1"
+      [disabled]="currentStepIndex() <= 1"
+      (click)="goToStep('staff')">
+      <span class="book__step-num">2</span> Peluquero
+    </button>
+    <span class="book__step-sep"></span>
+    <button class="book__step"
+      [class.active]="step() === 'date'"
+      [class.done]="currentStepIndex() > 2"
+      [disabled]="currentStepIndex() <= 2"
+      (click)="goToStep('date')">
+      <span class="book__step-num">3</span> Fecha
+    </button>
+    <span class="book__step-sep"></span>
+    <button class="book__step"
+      [class.active]="step() === 'slots' || step() === 'confirm'"
+      [class.done]="currentStepIndex() > 3"
+      [disabled]="currentStepIndex() <= 3"
+      (click)="goToStep('slots')">
+      <span class="book__step-num">4</span> Horario
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert--error">{{ error() }}</div>
+  }
+
+  <!-- PASO 1: Elegir servicio -->
+  @if (step() === 'service') {
+    <section class="book__section">
+      <h2 class="book__section-title">¿Qué servicio querés?</h2>
+      @if (loadingServices()) {
+        <p class="text-muted">Cargando servicios…</p>
+      } @else if (services().length === 0) {
+        <p class="text-muted">No hay servicios disponibles en este momento.</p>
+      } @else {
+        <div class="book__grid">
+          @for (svc of services(); track svc.id) {
+            <button class="card book__option-card" (click)="selectService(svc)">
+              <span class="book__option-name">{{ svc.name }}</span>
+              @if (svc.description) {
+                <span class="book__option-desc text-muted">{{ svc.description }}</span>
+              }
+              <div class="book__option-meta">
+                <span class="text-accent book__price">${{ svc.price }}</span>
+                <span class="text-muted">{{ svc.durationMinutes }} min</span>
+              </div>
+            </button>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <!-- PASO 2: Elegir peluquero -->
+  @if (step() === 'staff') {
+    <section class="book__section">
+      <div class="book__section-header">
+        <h2 class="book__section-title">¿Con quién?</h2>
+        <span class="text-muted book__selection-summary">{{ selectedService()?.name }}</span>
+      </div>
+      @if (loadingStaff()) {
+        <p class="text-muted">Cargando peluqueros…</p>
+      } @else if (staffList().length === 0) {
+        <p class="text-muted">No hay peluqueros disponibles en este momento.</p>
+      } @else {
+        <div class="book__grid">
+          @for (profile of staffList(); track profile.id) {
+            <button class="card book__option-card" (click)="selectStaff(profile)">
+              <span class="book__staff-avatar">{{ staffName(profile).charAt(0).toUpperCase() }}</span>
+              <span class="book__option-name">{{ staffName(profile) }}</span>
+              @if (profile.bio) {
+                <span class="book__option-desc text-muted">{{ profile.bio }}</span>
+              }
+              @if (profile.specialties?.length) {
+                <div class="book__tags">
+                  @for (tag of profile.specialties; track tag) {
+                    <span class="book__tag">{{ tag }}</span>
+                  }
+                </div>
+              }
+            </button>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <!-- PASO 3: Elegir fecha -->
+  @if (step() === 'date') {
+    <section class="book__section book__section--narrow">
+      <div class="book__section-header">
+        <h2 class="book__section-title">¿Qué día?</h2>
+        <span class="text-muted book__selection-summary">
+          {{ selectedService()?.name }} · {{ staffName(selectedStaff()!) }}
+        </span>
+      </div>
+      <app-calendar
+        [minDate]="minDate"
+        [selectedDate]="selectedDate()"
+        (dateSelected)="onDateChange($event)"
+      />
+    </section>
+  }
+
+  <!-- PASO 4: Elegir slot -->
+  @if (step() === 'slots') {
+    <section class="book__section">
+      <div class="book__section-header">
+        <h2 class="book__section-title">¿A qué hora?</h2>
+        <span class="text-muted book__selection-summary">
+          {{ selectedService()?.name }} · {{ staffName(selectedStaff()!) }} · {{ formatDate(selectedDate()) }}
+        </span>
+      </div>
+
+      @if (loadingSlots()) {
+        <p class="text-muted">Buscando horarios disponibles…</p>
+      } @else if (slots().length === 0) {
+        <div class="book__empty">
+          <span class="book__empty-icon">📅</span>
+          <p>No hay horarios disponibles para esta fecha.</p>
+          <p class="text-muted">Probá con otro día u otro peluquero.</p>
+          <button class="btn btn--ghost btn--sm" (click)="goToStep('date')">Cambiar fecha</button>
+        </div>
+      } @else {
+        <div class="book__slots">
+          @for (slot of slots(); track slot.startTime) {
+            <button
+              class="book__slot"
+              [class.selected]="selectedSlot()?.startTime === slot.startTime"
+              (click)="selectSlot(slot)">
+              {{ formatTime(slot.startTime) }}
+            </button>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <!-- PASO 5: Confirmar -->
+  @if (step() === 'confirm') {
+    <section class="book__section book__section--narrow">
+      <h2 class="book__section-title">Confirmá tu turno</h2>
+      <div class="card book__summary">
+        <div class="book__summary-row">
+          <span class="text-muted">Servicio</span>
+          <span>{{ selectedService()?.name }}</span>
+        </div>
+        <div class="book__summary-row">
+          <span class="text-muted">Peluquero</span>
+          <span>{{ staffName(selectedStaff()!) }}</span>
+        </div>
+        <div class="book__summary-row">
+          <span class="text-muted">Fecha</span>
+          <span>{{ formatDate(selectedDate()) }}</span>
+        </div>
+        <div class="book__summary-row">
+          <span class="text-muted">Hora</span>
+          <span class="text-accent book__summary-time">{{ formatTime(selectedSlot()!.startTime) }}</span>
+        </div>
+        <div class="book__summary-row">
+          <span class="text-muted">Duración</span>
+          <span>{{ selectedService()?.durationMinutes }} min</span>
+        </div>
+        <div class="book__summary-row">
+          <span class="text-muted">Precio</span>
+          <span>${{ selectedService()?.price }}</span>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="form-field">
+          <label for="notes">Notas (opcional)</label>
+          <input
+            id="notes"
+            type="text"
+            placeholder="Ej: sin productos con fragancia"
+            [ngModel]="notes()"
+            (ngModelChange)="notes.set($event)"
+          />
+        </div>
+      </div>
+
+      <div class="book__confirm-actions">
+        <button
+          class="btn btn--primary btn--full"
+          [disabled]="submitting()"
+          (click)="confirm()">
+          {{ submitting() ? 'Reservando…' : 'Confirmar reserva' }}
+        </button>
+        <button class="btn btn--ghost btn--full" (click)="goToStep('slots')">
+          Cambiar horario
+        </button>
+      </div>
+    </section>
+  }
+
+</div>

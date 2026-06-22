@@ -1,0 +1,57 @@
+.dashboard {
+  &__header {
+    align-items: flex-start;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  &__greeting {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  &__date {
+    font-size: 0.875rem;
+    text-transform: capitalize;
+  }
+
+  &__grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: border-color var(--t), box-shadow var(--t);
+
+    &:hover {
+      border-color: var(--surface-3);
+      box-shadow: var(--shadow-lg);
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    p {
+      font-size: 0.875rem;
+      flex: 1;
+    }
+
+    a {
+      align-self: flex-start;
+      margin-top: 0.5rem;
+    }
+  }
+
+  &__card-icon {
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+  }
+}

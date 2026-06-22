@@ -1,0 +1,94 @@
+.navbar {
+  align-items: center;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 1.5rem;
+  padding: 0 1.5rem;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  &__brand {
+    align-items: center;
+    color: var(--accent);
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.5rem;
+    text-decoration: none;
+
+    &:hover { color: var(--accent-h); }
+
+    &-icon {
+      display: inline-block;
+      font-size: 1.1rem;
+      transform: rotate(-45deg);
+    }
+
+    &-name {
+      font-size: 0.825rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+    }
+  }
+
+  &__nav {
+    align-items: center;
+    display: flex;
+    flex: 1;
+    gap: 0.25rem;
+    list-style: none;
+
+    a {
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.4rem 0.75rem;
+      transition: color var(--t), background var(--t);
+
+      &:hover { color: var(--text); background: var(--surface-2); }
+      &.active { color: var(--accent); background: rgba(201, 168, 76, 0.1); }
+    }
+  }
+
+  &__user {
+    align-items: center;
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.75rem;
+  }
+
+  &__email {
+    font-size: 0.8125rem;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__badge {
+    background: var(--accent);
+    color: #0f0f0f;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+
+  &__nav-item--rel {
+    position: relative;
+  }
+}
+
+.shell-main {
+  min-height: calc(100vh - 56px);
+}

@@ -1,0 +1,16 @@
+# Env
+.env
+**/.env
+.env.production
+.env.*.local
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log

@@ -1,0 +1,63 @@
+<div class="auth-page">
+  <div class="card auth-card">
+
+    <div class="auth-brand">
+      <span class="auth-brand__icon">✂</span>
+      <span class="auth-brand__name">TIJERAPP</span>
+    </div>
+
+    <h1 class="auth-title">Bienvenido de vuelta</h1>
+    <p class="auth-subtitle text-muted">Ingresá con tu cuenta para continuar</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+
+      @if (error()) {
+        <div class="alert alert--error">{{ error() }}</div>
+      }
+
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="tu@email.com"
+          autocomplete="email"
+          [class.is-invalid]="email.invalid && email.touched"
+        />
+        @if (email.hasError('required') && email.touched) {
+          <span class="field-error">El email es requerido</span>
+        } @else if (email.hasError('email') && email.touched) {
+          <span class="field-error">Ingresá un email válido</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="password">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="••••••"
+          autocomplete="current-password"
+          [class.is-invalid]="password.invalid && password.touched"
+        />
+        @if (password.hasError('required') && password.touched) {
+          <span class="field-error">La contraseña es requerida</span>
+        } @else if (password.hasError('minlength') && password.touched) {
+          <span class="field-error">Mínimo 6 caracteres</span>
+        }
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--full" [disabled]="loading()">
+        {{ loading() ? 'Ingresando...' : 'Ingresar' }}
+      </button>
+
+    </form>
+
+    <p class="auth-footer text-muted">
+      ¿No tenés cuenta?&nbsp;<a routerLink="/auth/register">Registrate</a>
+    </p>
+
+  </div>
+</div>

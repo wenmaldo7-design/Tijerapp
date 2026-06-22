@@ -1,0 +1,192 @@
+.staff-panel {
+
+  &__header {
+    margin-bottom: 2rem;
+    h1 { font-size: 1.5rem; font-weight: 700; }
+  }
+
+  // ─── Tabs ───
+  &__tabs {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.25rem;
+    margin-bottom: 2rem;
+    width: fit-content;
+  }
+
+  &__tab {
+    background: transparent;
+    border: none;
+    border-radius: calc(var(--radius) - 2px);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.45rem 1.1rem;
+    transition: background var(--t), color var(--t);
+
+    &:hover { color: var(--text); }
+
+    &--active {
+      background: var(--surface-3);
+      color: var(--text);
+      font-weight: 600;
+    }
+  }
+
+  // ─── Section ───
+  &__section { max-width: 860px; }
+
+  &__section-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+
+    h2 { font-size: 1.1rem; font-weight: 600; }
+  }
+
+  // ─── Agenda filter ───
+  &__filter-row {
+    align-items: flex-end;
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  &__date-field { flex: 0 0 200px; }
+
+  // ─── Appointment card ───
+  &__appt-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  &__appt-card { padding: 1rem 1.25rem; }
+
+  &__appt-main {
+    align-items: center;
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  &__time-block {
+    display: flex;
+    flex-direction: column;
+    min-width: 72px;
+  }
+
+  &__time {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  &__date { font-size: 0.78rem; }
+
+  &__appt-details {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  &__client-name { font-weight: 600; }
+
+  &__appt-aside {
+    align-items: flex-end;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__appt-actions { display: flex; gap: 0.5rem; }
+
+  &__notes {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  // ─── Working hours ───
+  &__wh-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  &__wh-row {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+  }
+
+  &__wh-info { display: flex; align-items: center; gap: 1rem; }
+
+  &__wh-day { font-weight: 600; min-width: 3rem; }
+
+  &__wh-actions { display: flex; gap: 0.5rem; }
+
+  // ─── Time Off ───
+  &__to-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  &__to-row {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+  }
+
+  &__to-info { display: flex; flex-direction: column; gap: 0.15rem; }
+
+  &__to-dates { font-weight: 600; font-size: 0.95rem; }
+
+  // ─── Forms ───
+  &__form-card { margin-bottom: 1rem; }
+
+  &__form-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__form-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    margin-bottom: 1.25rem;
+
+    select {
+      appearance: none;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9375rem;
+      outline: none;
+      padding: 0.65rem 0.9rem;
+      width: 100%;
+      transition: border-color var(--t);
+
+      &:focus { border-color: var(--accent); }
+    }
+  }
+
+  &__form-actions { display: flex; gap: 0.75rem; }
+
+  // ─── Empty state ───
+  &__empty {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 3rem 0;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  &__empty-icon { font-size: 2.5rem; }
+}

@@ -1,0 +1,101 @@
+<div class="page my-appts">
+
+  <header class="my-appts__header">
+    <div>
+      <h1>Mis Turnos</h1>
+      <p class="text-muted">Tus reservas activas e historial</p>
+    </div>
+    <a routerLink="/book" class="btn btn--primary">+ Reservar turno</a>
+  </header>
+
+  @if (error()) {
+    <div class="alert alert--error">{{ error() }}</div>
+  }
+
+  @if (cancelError()) {
+    <div class="alert alert--error">{{ cancelError() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="text-muted">Cargando turnos…</p>
+  } @else {
+
+    <!-- Próximos -->
+    <section class="my-appts__section">
+      <h2 class="my-appts__section-title">Próximos</h2>
+
+      @if (upcoming().length === 0) {
+        <div class="my-appts__empty">
+          <span class="my-appts__empty-icon">📅</span>
+          <p>No tenés turnos próximos.</p>
+          <a routerLink="/book" class="btn btn--ghost btn--sm">Reservar ahora</a>
+        </div>
+      } @else {
+        <div class="my-appts__list">
+          @for (appt of upcoming(); track appt.id) {
+            <div class="card my-appts__card">
+              <div class="my-appts__card-main">
+                <div class="my-appts__time-block">
+                  <span class="my-appts__time">{{ formatTime(appt.startTime) }}</span>
+                  <span class="my-appts__date text-muted">{{ formatDate(appt.startTime) }}</span>
+                </div>
+                <div class="my-appts__details">
+                  <span class="my-appts__service-name">{{ appt.service.name }}</span>
+                  <span class="my-appts__staff text-muted">con {{ staffName(appt) }}</span>
+                  <div class="my-appts__meta">
+                    <span class="text-muted">{{ appt.service.durationMinutes }} min · ${{ appt.service.price }}</span>
+                  </div>
+                </div>
+                <div class="my-appts__card-aside">
+                  <span [class]="badgeClass(appt.status)">{{ statusLabel(appt.status) }}</span>
+                  <button class="btn btn--ghost btn--sm" (click)="startChat(appt)">
+                    Chatear
+                  </button>
+                  @if (canCancel(appt)) {
+                    <button
+                      class="btn btn--danger btn--sm"
+                      [disabled]="cancellingId() === appt.id"
+                      (click)="cancelAppointment(appt)">
+                      {{ cancellingId() === appt.id ? 'Cancelando…' : 'Cancelar' }}
+                    </button>
+                  }
+                </div>
+              </div>
+              @if (appt.notes) {
+                <p class="my-appts__notes text-muted">{{ appt.notes }}</p>
+              }
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Historial -->
+    @if (past().length > 0) {
+      <section class="my-appts__section">
+        <h2 class="my-appts__section-title">Historial</h2>
+        <div class="my-appts__list my-appts__list--past">
+          @for (appt of past(); track appt.id) {
+            <div class="card my-appts__card my-appts__card--past">
+              <div class="my-appts__card-main">
+                <div class="my-appts__time-block">
+                  <span class="my-appts__time">{{ formatTime(appt.startTime) }}</span>
+                  <span class="my-appts__date text-muted">{{ formatDate(appt.startTime) }}</span>
+                </div>
+                <div class="my-appts__details">
+                  <span class="my-appts__service-name">{{ appt.service.name }}</span>
+                  <span class="my-appts__staff text-muted">con {{ staffName(appt) }}</span>
+                </div>
+                <div class="my-appts__card-aside">
+                  <span [class]="badgeClass(appt.status)">{{ statusLabel(appt.status) }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+  }
+
+</div>

@@ -1,0 +1,245 @@
+.admin-panel {
+
+  &__header {
+    margin-bottom: 2rem;
+    h1 { font-size: 1.5rem; font-weight: 700; }
+  }
+
+  // ─── Tabs ───
+  &__tabs {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.25rem;
+    margin-bottom: 2rem;
+    width: fit-content;
+  }
+
+  &__tab {
+    background: transparent;
+    border: none;
+    border-radius: calc(var(--radius) - 2px);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.45rem 1.1rem;
+    transition: background var(--t), color var(--t);
+
+    &:hover { color: var(--text); }
+
+    &--active {
+      background: var(--surface-3);
+      color: var(--text);
+      font-weight: 600;
+    }
+  }
+
+  // ─── Section ───
+  &__section { max-width: 860px; }
+
+  &__section-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+
+    h2 { font-size: 1.1rem; font-weight: 600; }
+  }
+
+  // ─── List rows (servicios / peluqueros) ───
+  &__list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  &__row {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+
+    &--inactive { opacity: 0.6; }
+  }
+
+  &__row-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  &__row-title {
+    align-items: center;
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  &__row-name { font-weight: 600; font-size: 1rem; }
+
+  &__row-actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.5rem;
+  }
+
+  // ─── Forms ───
+  &__form-card { margin-bottom: 1rem; }
+
+  &__form-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__form-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    margin-bottom: 1.25rem;
+  }
+
+  &__field--wide { grid-column: 1 / -1; }
+
+  &__form-actions { display: flex; gap: 0.75rem; }
+
+  // ─── Empty state ───
+  &__empty {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 3rem 0;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  &__empty-icon { font-size: 2.5rem; }
+
+  // ─── Wide section (turnos) ───
+  &__section--wide { max-width: 1060px; }
+
+  // ─── Summary cards ───
+  &__summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  &__summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    border-left: 3px solid transparent;
+
+    &--pending   { border-left-color: #f59e0b; }
+    &--confirmed { border-left-color: var(--success); }
+    &--completed { border-left-color: var(--text-muted); }
+    &--cancelled { border-left-color: var(--error); }
+  }
+
+  &__summary-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__summary-count {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  // ─── Filters ───
+  &__filters { margin-bottom: 1rem; }
+
+  &__filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: flex-end;
+  }
+
+  &__filters-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding-bottom: 2px;
+  }
+
+  &__select {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    outline: none;
+    padding: 0.65rem 0.9rem;
+    transition: border-color var(--t);
+    cursor: pointer;
+
+    &:focus { border-color: var(--accent); }
+
+    option { background: var(--surface-2); }
+  }
+
+  // ─── Table ───
+  &__table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--surface);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    tbody tr {
+      transition: background var(--t);
+      &:last-child td { border-bottom: none; }
+      &:hover { background: var(--surface-2); }
+    }
+  }
+
+  // ─── Pagination ───
+  &__pagination {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  &__pagination-info {
+    margin-left: 0.5rem;
+    font-size: 0.8125rem;
+  }
+}

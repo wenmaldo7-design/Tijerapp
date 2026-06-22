@@ -1,0 +1,264 @@
+<div class="page staff-panel">
+
+  <header class="staff-panel__header">
+    <div>
+      <h1>Panel de Staff</h1>
+      @if (profile()) {
+        <p class="text-muted">{{ profile()!.user.name }}</p>
+      }
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p class="text-muted">Cargando perfil…</p>
+  } @else if (error()) {
+    <div class="alert alert--error">{{ error() }}</div>
+  } @else {
+
+    <!-- Tabs -->
+    <div class="staff-panel__tabs">
+      <button [class]="tabClass('agenda')" (click)="setTab('agenda')">Agenda</button>
+      <button [class]="tabClass('horarios')" (click)="setTab('horarios')">Mis Horarios</button>
+      <button [class]="tabClass('diaslibres')" (click)="setTab('diaslibres')">Días Libres</button>
+    </div>
+
+    <!-- ─── AGENDA ─── -->
+    @if (activeTab() === 'agenda') {
+
+      <section class="staff-panel__section">
+        <div class="staff-panel__filter-row">
+          <div class="form-field staff-panel__date-field">
+            <label for="agendaDate">Filtrar por fecha</label>
+            <input id="agendaDate" type="date" [(ngModel)]="agendaDateFilter" />
+          </div>
+          <button class="btn btn--ghost btn--sm" (click)="loadAgenda()">Buscar</button>
+          @if (agendaDateFilter) {
+            <button class="btn btn--danger btn--sm" (click)="agendaDateFilter = ''; loadAgenda()">Limpiar</button>
+          }
+        </div>
+
+        @if (agendaError()) {
+          <div class="alert alert--error">{{ agendaError() }}</div>
+        }
+        @if (actionError()) {
+          <div class="alert alert--error">{{ actionError() }}</div>
+        }
+
+        @if (agendaLoading()) {
+          <p class="text-muted">Cargando turnos…</p>
+        } @else if (appointments().length === 0) {
+          <div class="staff-panel__empty">
+            <span class="staff-panel__empty-icon">📅</span>
+            <p>No hay turnos{{ agendaDateFilter ? ' para esta fecha' : '' }}.</p>
+          </div>
+        } @else {
+          <div class="staff-panel__appt-list">
+            @for (appt of appointments(); track appt.id) {
+              <div class="card staff-panel__appt-card">
+                <div class="staff-panel__appt-main">
+
+                  <div class="staff-panel__time-block">
+                    <span class="staff-panel__time">{{ formatTime(appt.startTime) }}</span>
+                    <span class="staff-panel__date text-muted">{{ formatDate(appt.startTime) }}</span>
+                  </div>
+
+                  <div class="staff-panel__appt-details">
+                    <span class="staff-panel__client-name">{{ clientName(appt) }}</span>
+                    <span class="text-muted">{{ appt.service?.name }}</span>
+                    <span class="text-muted">{{ appt.service?.durationMinutes }} min</span>
+                  </div>
+
+                  <div class="staff-panel__appt-aside">
+                    <span [class]="badgeClass(appt.status)">{{ statusLabel(appt.status) }}</span>
+                    <div class="staff-panel__appt-actions">
+                      @if (appt.status === 'PENDING') {
+                        <button
+                          class="btn btn--primary btn--sm"
+                          [disabled]="actionId() === appt.id"
+                          (click)="confirmAppt(appt)">
+                          {{ actionId() === appt.id ? '…' : 'Confirmar' }}
+                        </button>
+                      }
+                      @if (appt.status === 'CONFIRMED') {
+                        <button
+                          class="btn btn--ghost btn--sm"
+                          [disabled]="actionId() === appt.id"
+                          (click)="completeAppt(appt)">
+                          {{ actionId() === appt.id ? '…' : 'Completar' }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                </div>
+                @if (appt.notes) {
+                  <p class="staff-panel__notes text-muted">{{ appt.notes }}</p>
+                }
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+    }
+
+    <!-- ─── HORARIOS ─── -->
+    @if (activeTab() === 'horarios') {
+
+      <section class="staff-panel__section">
+        <div class="staff-panel__section-header">
+          <h2>Franjas horarias</h2>
+          @if (!showWhForm()) {
+            <button class="btn btn--primary btn--sm" (click)="openAddWhForm()">+ Agregar</button>
+          }
+        </div>
+
+        @if (whError()) {
+          <div class="alert alert--error">{{ whError() }}</div>
+        }
+
+        <!-- Formulario agregar/editar -->
+        @if (showWhForm()) {
+          <div class="card staff-panel__form-card">
+            <h3 class="staff-panel__form-title">{{ editingWhId() ? 'Editar horario' : 'Nuevo horario' }}</h3>
+            <div class="staff-panel__form-grid">
+              <div class="form-field">
+                <label for="whDay">Día</label>
+                <select id="whDay" [(ngModel)]="whDayOfWeek">
+                  @for (d of dayNames; track d.value) {
+                    <option [value]="d.value">{{ d.label }}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="whStart">Desde</label>
+                <input id="whStart" type="time" [(ngModel)]="whStartTime" />
+              </div>
+              <div class="form-field">
+                <label for="whEnd">Hasta</label>
+                <input id="whEnd" type="time" [(ngModel)]="whEndTime" />
+              </div>
+            </div>
+            <div class="staff-panel__form-actions">
+              <button class="btn btn--primary btn--sm" [disabled]="whSaving()" (click)="saveWh()">
+                {{ whSaving() ? 'Guardando…' : 'Guardar' }}
+              </button>
+              <button class="btn btn--ghost btn--sm" [disabled]="whSaving()" (click)="cancelWhForm()">Cancelar</button>
+            </div>
+          </div>
+        }
+
+        @if (sortedWorkingHours().length === 0 && !showWhForm()) {
+          <div class="staff-panel__empty">
+            <span class="staff-panel__empty-icon">🕐</span>
+            <p>No hay franjas horarias configuradas.</p>
+          </div>
+        } @else {
+          <div class="staff-panel__wh-list">
+            @for (wh of sortedWorkingHours(); track wh.id) {
+              <div class="card staff-panel__wh-row">
+                <div class="staff-panel__wh-info">
+                  <span class="staff-panel__wh-day">{{ dayName(wh.dayOfWeek) }}</span>
+                  <span class="text-muted">{{ wh.startTime }} – {{ wh.endTime }}</span>
+                </div>
+                <div class="staff-panel__wh-actions">
+                  <button
+                    class="btn btn--ghost btn--sm"
+                    [disabled]="deletingWhId() === wh.id"
+                    (click)="openEditWhForm(wh)">
+                    Editar
+                  </button>
+                  <button
+                    class="btn btn--danger btn--sm"
+                    [disabled]="deletingWhId() === wh.id"
+                    (click)="deleteWh(wh)">
+                    {{ deletingWhId() === wh.id ? '…' : 'Eliminar' }}
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+    }
+
+    <!-- ─── DÍAS LIBRES ─── -->
+    @if (activeTab() === 'diaslibres') {
+
+      <section class="staff-panel__section">
+        <div class="staff-panel__section-header">
+          <h2>Bloqueos de agenda</h2>
+          @if (!showToForm()) {
+            <button class="btn btn--primary btn--sm" (click)="openAddToForm()">+ Agregar</button>
+          }
+        </div>
+
+        @if (toError()) {
+          <div class="alert alert--error">{{ toError() }}</div>
+        }
+
+        <!-- Formulario -->
+        @if (showToForm()) {
+          <div class="card staff-panel__form-card">
+            <h3 class="staff-panel__form-title">Nuevo bloqueo</h3>
+            <div class="staff-panel__form-grid">
+              <div class="form-field">
+                <label for="tofStart">Desde</label>
+                <input id="tofStart" type="date" [(ngModel)]="tofStartDate" required />
+              </div>
+              <div class="form-field">
+                <label for="tofEnd">Hasta</label>
+                <input id="tofEnd" type="date" [(ngModel)]="tofEndDate" required />
+              </div>
+              <div class="form-field">
+                <label for="tofReason">Motivo (opcional)</label>
+                <input id="tofReason" type="text" [(ngModel)]="tofReason" placeholder="Ej: Vacaciones" />
+              </div>
+            </div>
+            <div class="staff-panel__form-actions">
+              <button
+                class="btn btn--primary btn--sm"
+                [disabled]="toSaving() || !tofStartDate || !tofEndDate"
+                (click)="saveTimeOff()">
+                {{ toSaving() ? 'Guardando…' : 'Guardar' }}
+              </button>
+              <button class="btn btn--ghost btn--sm" [disabled]="toSaving()" (click)="cancelToForm()">Cancelar</button>
+            </div>
+          </div>
+        }
+
+        @if (toLoading()) {
+          <p class="text-muted">Cargando bloqueos…</p>
+        } @else if (timeOffs().length === 0 && !showToForm()) {
+          <div class="staff-panel__empty">
+            <span class="staff-panel__empty-icon">🏖️</span>
+            <p>No hay días libres ni bloqueos configurados.</p>
+          </div>
+        } @else {
+          <div class="staff-panel__to-list">
+            @for (to of timeOffs(); track to.id) {
+              <div class="card staff-panel__to-row">
+                <div class="staff-panel__to-info">
+                  <span class="staff-panel__to-dates">{{ to.startDate }} → {{ to.endDate }}</span>
+                  @if (to.reason) {
+                    <span class="text-muted">{{ to.reason }}</span>
+                  }
+                </div>
+                <button
+                  class="btn btn--danger btn--sm"
+                  [disabled]="deletingToId() === to.id"
+                  (click)="deleteTimeOff(to)">
+                  {{ deletingToId() === to.id ? '…' : 'Eliminar' }}
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+    }
+
+  }
+
+</div>

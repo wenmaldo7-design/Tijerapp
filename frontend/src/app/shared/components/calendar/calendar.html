@@ -1,0 +1,39 @@
+<div class="calendar">
+  <div class="calendar__nav">
+    <button class="calendar__nav-btn" type="button" [disabled]="!canGoPrev()" (click)="prevMonth()">
+      &#8249;
+    </button>
+    <span class="calendar__title">{{ calendarTitle() }}</span>
+    <button class="calendar__nav-btn" type="button" (click)="nextMonth()">
+      &#8250;
+    </button>
+  </div>
+
+  <div class="calendar__weekdays">
+    <span>Lu</span>
+    <span>Ma</span>
+    <span>Mi</span>
+    <span>Ju</span>
+    <span>Vi</span>
+    <span>Sa</span>
+    <span>Do</span>
+  </div>
+
+  <div class="calendar__grid">
+    @for (cell of calendarDays(); track cell.key) {
+      @if (cell.isEmpty) {
+        <span class="calendar__cell"></span>
+      } @else {
+        <button
+          class="calendar__cell calendar__day"
+          type="button"
+          [class.today]="cell.isToday"
+          [class.selected]="selectedDate() === cell.iso"
+          [disabled]="cell.isPast || cell.isSunday"
+          (click)="selectDay(cell.iso)">
+          {{ cell.day }}
+        </button>
+      }
+    }
+  </div>
+</div>

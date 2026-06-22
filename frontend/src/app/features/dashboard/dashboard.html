@@ -1,0 +1,42 @@
+<div class="page dashboard">
+
+  <header class="dashboard__header">
+    <div>
+      <h1 class="dashboard__greeting">
+        Hola, <span class="text-accent">{{ userName() }}</span>
+      </h1>
+      <p class="text-muted dashboard__date">{{ today }}</p>
+    </div>
+    <span [class]="roleBadgeClass()">{{ auth.currentRole() }}</span>
+  </header>
+
+  <div class="dashboard__grid">
+
+    <div class="card dashboard__card">
+      <div class="dashboard__card-icon">📅</div>
+      <h3>Mis Turnos</h3>
+      <p class="text-muted">Ver y gestionar tus reservas</p>
+      <a routerLink="/appointments" class="btn btn--ghost btn--sm">Ver turnos</a>
+    </div>
+
+    @if (auth.hasRole('STAFF', 'ADMIN')) {
+      <div class="card dashboard__card">
+        <div class="dashboard__card-icon">✂</div>
+        <h3>Agenda del día</h3>
+        <p class="text-muted">Turnos programados para hoy</p>
+        <a routerLink="/staff" class="btn btn--ghost btn--sm">Ver agenda</a>
+      </div>
+    }
+
+    @if (auth.hasRole('ADMIN')) {
+      <div class="card dashboard__card">
+        <div class="dashboard__card-icon">⚙</div>
+        <h3>Administración</h3>
+        <p class="text-muted">Servicios, staff y configuración</p>
+        <a routerLink="/admin" class="btn btn--ghost btn--sm">Administrar</a>
+      </div>
+    }
+
+  </div>
+
+</div>

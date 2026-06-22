@@ -1,0 +1,362 @@
+<div class="page admin-panel">
+
+  <header class="admin-panel__header">
+    <h1>Administración</h1>
+  </header>
+
+  <!-- Tabs -->
+  <div class="admin-panel__tabs">
+    <button [class]="tabClass('servicios')" (click)="setTab('servicios')">Servicios</button>
+    <button [class]="tabClass('peluqueros')" (click)="setTab('peluqueros')">Peluqueros</button>
+    <button [class]="tabClass('turnos')" (click)="setTab('turnos')">Turnos</button>
+  </div>
+
+  <!-- ─── SERVICIOS ─── -->
+  @if (activeTab() === 'servicios') {
+
+    <section class="admin-panel__section">
+      <div class="admin-panel__section-header">
+        <h2>Servicios</h2>
+        @if (!showServiceForm()) {
+          <button class="btn btn--primary btn--sm" (click)="openCreateServiceForm()">+ Nuevo servicio</button>
+        }
+      </div>
+
+      @if (servicesError()) {
+        <div class="alert alert--error">{{ servicesError() }}</div>
+      }
+
+      @if (showServiceForm()) {
+        <div class="card admin-panel__form-card">
+          <h3 class="admin-panel__form-title">{{ editingServiceId() ? 'Editar servicio' : 'Nuevo servicio' }}</h3>
+
+          @if (serviceFormError()) {
+            <div class="alert alert--error">{{ serviceFormError() }}</div>
+          }
+
+          <div class="admin-panel__form-grid">
+            <div class="form-field admin-panel__field--wide">
+              <label for="svcName">Nombre</label>
+              <input id="svcName" type="text" [(ngModel)]="svcName" placeholder="Corte de cabello" />
+            </div>
+            <div class="form-field admin-panel__field--wide">
+              <label for="svcDescription">Descripción <span class="text-muted">(opcional)</span></label>
+              <input id="svcDescription" type="text" [(ngModel)]="svcDescription" placeholder="Corte clásico con tijera o máquina" />
+            </div>
+            <div class="form-field">
+              <label for="svcDuration">Duración (min)</label>
+              <input id="svcDuration" type="number" min="5" step="5" [(ngModel)]="svcDuration" placeholder="30" />
+            </div>
+            <div class="form-field">
+              <label for="svcPrice">Precio</label>
+              <input id="svcPrice" type="number" min="0" step="0.01" [(ngModel)]="svcPrice" placeholder="1500" />
+            </div>
+          </div>
+
+          <div class="admin-panel__form-actions">
+            <button
+              class="btn btn--primary btn--sm"
+              [disabled]="serviceSaving() || !serviceFormValid"
+              (click)="saveService()">
+              {{ serviceSaving() ? 'Guardando…' : 'Guardar' }}
+            </button>
+            <button class="btn btn--ghost btn--sm" [disabled]="serviceSaving()" (click)="cancelServiceForm()">Cancelar</button>
+          </div>
+        </div>
+      }
+
+      @if (servicesLoading()) {
+        <p class="text-muted">Cargando servicios…</p>
+      } @else if (services().length === 0 && !showServiceForm()) {
+        <div class="admin-panel__empty">
+          <span class="admin-panel__empty-icon">✂</span>
+          <p>No hay servicios creados todavía.</p>
+        </div>
+      } @else {
+        <div class="admin-panel__list">
+          @for (svc of services(); track svc.id) {
+            <div class="card admin-panel__row" [class.admin-panel__row--inactive]="!svc.isActive">
+              <div class="admin-panel__row-info">
+                <div class="admin-panel__row-title">
+                  <span class="admin-panel__row-name">{{ svc.name }}</span>
+                  @if (!svc.isActive) {
+                    <span class="badge badge--client">Inactivo</span>
+                  }
+                </div>
+                @if (svc.description) {
+                  <span class="text-muted">{{ svc.description }}</span>
+                }
+                <span class="text-muted">{{ svc.durationMinutes }} min · ${{ svc.price }}</span>
+              </div>
+              <div class="admin-panel__row-actions">
+                <button class="btn btn--ghost btn--sm" (click)="openEditServiceForm(svc)">Editar</button>
+                <button
+                  class="btn btn--danger btn--sm"
+                  [disabled]="togglingServiceId() === svc.id"
+                  (click)="toggleServiceActive(svc)">
+                  {{ togglingServiceId() === svc.id ? '…' : (svc.isActive ? 'Desactivar' : 'Reactivar') }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+  }
+
+  <!-- ─── PELUQUEROS ─── -->
+  @if (activeTab() === 'peluqueros') {
+
+    <section class="admin-panel__section">
+      <div class="admin-panel__section-header">
+        <h2>Peluqueros</h2>
+        @if (!showStaffForm()) {
+          <button class="btn btn--primary btn--sm" (click)="openCreateStaffForm()">+ Nuevo peluquero</button>
+        }
+      </div>
+
+      @if (staffError()) {
+        <div class="alert alert--error">{{ staffError() }}</div>
+      }
+
+      @if (showStaffForm()) {
+        <div class="card admin-panel__form-card">
+          <h3 class="admin-panel__form-title">
+            {{ editingStaffId() ? 'Editar peluquero' : 'Nuevo peluquero' }}
+          </h3>
+
+          @if (staffFormError()) {
+            <div class="alert alert--error">{{ staffFormError() }}</div>
+          }
+
+          <div class="admin-panel__form-grid">
+            @if (!editingStaffId()) {
+              <div class="form-field admin-panel__field--wide">
+                <label for="stfName">Nombre completo</label>
+                <input id="stfName" type="text" [(ngModel)]="stfName" placeholder="María Gómez" />
+              </div>
+              <div class="form-field">
+                <label for="stfEmail">Email</label>
+                <input id="stfEmail" type="email" [(ngModel)]="stfEmail" placeholder="maria@tijerapp.com" autocomplete="off" />
+              </div>
+              <div class="form-field">
+                <label for="stfPassword">Contraseña inicial</label>
+                <input id="stfPassword" type="password" [(ngModel)]="stfPassword" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+              </div>
+              <div class="form-field">
+                <label for="stfPhone">Teléfono <span class="text-muted">(opcional)</span></label>
+                <input id="stfPhone" type="tel" [(ngModel)]="stfPhone" placeholder="+54 11 1234-5678" />
+              </div>
+            } @else {
+              <div class="form-field">
+                <label>Nombre</label>
+                <input type="text" [value]="stfName" disabled />
+              </div>
+              <div class="form-field">
+                <label>Email</label>
+                <input type="email" [value]="stfEmail" disabled />
+              </div>
+            }
+            <div class="form-field admin-panel__field--wide">
+              <label for="stfSpecialties">Especialidades <span class="text-muted">(separadas por coma)</span></label>
+              <input id="stfSpecialties" type="text" [(ngModel)]="stfSpecialties" placeholder="corte, tinte, alisado" />
+            </div>
+            <div class="form-field admin-panel__field--wide">
+              <label for="stfBio">Bio <span class="text-muted">(opcional)</span></label>
+              <input id="stfBio" type="text" [(ngModel)]="stfBio" placeholder="Especialista en coloración y cortes modernos." />
+            </div>
+          </div>
+
+          <div class="admin-panel__form-actions">
+            <button
+              class="btn btn--primary btn--sm"
+              [disabled]="staffSaving() || !staffFormValid"
+              (click)="saveStaff()">
+              {{ staffSaving() ? 'Guardando…' : 'Guardar' }}
+            </button>
+            <button class="btn btn--ghost btn--sm" [disabled]="staffSaving()" (click)="cancelStaffForm()">Cancelar</button>
+          </div>
+        </div>
+      }
+
+      @if (staffLoading()) {
+        <p class="text-muted">Cargando peluqueros…</p>
+      } @else if (staffList().length === 0 && !showStaffForm()) {
+        <div class="admin-panel__empty">
+          <span class="admin-panel__empty-icon">💇</span>
+          <p>No hay peluqueros registrados todavía.</p>
+        </div>
+      } @else {
+        <div class="admin-panel__list">
+          @for (profile of staffList(); track profile.id) {
+            <div class="card admin-panel__row" [class.admin-panel__row--inactive]="!profile.user.isActive">
+              <div class="admin-panel__row-info">
+                <div class="admin-panel__row-title">
+                  <span class="admin-panel__row-name">{{ profile.user.name }}</span>
+                  <span class="badge badge--staff">Staff</span>
+                  @if (!profile.user.isActive) {
+                    <span class="badge badge--client">Inactivo</span>
+                  }
+                </div>
+                <span class="text-muted">{{ profile.user.email }}</span>
+                @if (profile.user.phone) {
+                  <span class="text-muted">{{ profile.user.phone }}</span>
+                }
+                @if (profile.specialties?.length) {
+                  <span class="text-muted">{{ profile.specialties!.join(', ') }}</span>
+                }
+                @if (profile.bio) {
+                  <span class="text-muted">{{ profile.bio }}</span>
+                }
+              </div>
+              <div class="admin-panel__row-actions">
+                <button class="btn btn--ghost btn--sm" (click)="startChatWithStaff(profile)">Chatear</button>
+                <button class="btn btn--ghost btn--sm" (click)="openEditStaffForm(profile)">Editar</button>
+                <button
+                  class="btn btn--danger btn--sm"
+                  [disabled]="togglingStaffId() === profile.id"
+                  (click)="toggleStaffActive(profile)">
+                  {{ togglingStaffId() === profile.id ? '…' : (profile.user.isActive ? 'Desactivar' : 'Reactivar') }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+  }
+
+  <!-- ─── TURNOS ─── -->
+  @if (activeTab() === 'turnos') {
+
+    <section class="admin-panel__section admin-panel__section--wide">
+
+      <div class="admin-panel__section-header">
+        <h2>Turnos</h2>
+      </div>
+
+      <!-- Tarjetas de resumen -->
+      @if (apptResult()) {
+        <div class="admin-panel__summary">
+          <div class="admin-panel__summary-card admin-panel__summary-card--pending">
+            <span class="admin-panel__summary-label">Pendientes</span>
+            <span class="admin-panel__summary-count">{{ summaryOf('PENDING') }}</span>
+          </div>
+          <div class="admin-panel__summary-card admin-panel__summary-card--confirmed">
+            <span class="admin-panel__summary-label">Confirmados</span>
+            <span class="admin-panel__summary-count">{{ summaryOf('CONFIRMED') }}</span>
+          </div>
+          <div class="admin-panel__summary-card admin-panel__summary-card--completed">
+            <span class="admin-panel__summary-label">Completados</span>
+            <span class="admin-panel__summary-count">{{ summaryOf('COMPLETED') }}</span>
+          </div>
+          <div class="admin-panel__summary-card admin-panel__summary-card--cancelled">
+            <span class="admin-panel__summary-label">Cancelados</span>
+            <span class="admin-panel__summary-count">{{ summaryOf('CANCELLED') }}</span>
+          </div>
+        </div>
+      }
+
+      <!-- Filtros -->
+      <div class="card admin-panel__filters">
+        <div class="admin-panel__filters-row">
+          <div class="form-field">
+            <label for="apptFrom">Desde</label>
+            <input id="apptFrom" type="date" [(ngModel)]="apptFrom" />
+          </div>
+          <div class="form-field">
+            <label for="apptTo">Hasta</label>
+            <input id="apptTo" type="date" [(ngModel)]="apptTo" />
+          </div>
+          <div class="form-field">
+            <label for="apptStatus">Estado</label>
+            <select id="apptStatus" class="admin-panel__select" [(ngModel)]="apptStatus">
+              @for (opt of statusOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="admin-panel__filters-actions">
+            <button class="btn btn--primary btn--sm" (click)="apptSearch()">Buscar</button>
+            <button class="btn btn--ghost btn--sm" (click)="apptFrom=''; apptTo=''; apptStatus=''; apptSearch()">Limpiar</button>
+          </div>
+        </div>
+      </div>
+
+      @if (apptError()) {
+        <div class="alert alert--error">{{ apptError() }}</div>
+      }
+
+      @if (apptLoading()) {
+        <p class="text-muted">Cargando turnos…</p>
+      } @else if (apptList().length === 0) {
+        <div class="admin-panel__empty">
+          <span class="admin-panel__empty-icon">📅</span>
+          <p>No hay turnos para los filtros seleccionados.</p>
+        </div>
+      } @else {
+
+        <!-- Tabla -->
+        <div class="admin-panel__table-wrap">
+          <table class="admin-panel__table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Cliente</th>
+                <th>Peluquero</th>
+                <th>Servicio</th>
+                <th>Inicio</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (appt of apptList(); track appt.id) {
+                <tr>
+                  <td class="text-muted">{{ appt.id }}</td>
+                  <td>{{ appt.client?.name ?? '—' }}</td>
+                  <td>{{ appt.staff?.user?.name ?? '—' }}</td>
+                  <td>{{ appt.service?.name ?? '—' }}</td>
+                  <td class="text-muted">{{ apptFormatDateTime(appt.startTime) }}</td>
+                  <td><span [class]="apptBadgeClass(appt.status)">{{ apptStatusLabel(appt.status) }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación -->
+        @if ((apptResult()?.totalPages ?? 1) > 1) {
+          <div class="admin-panel__pagination">
+            <button
+              class="btn btn--ghost btn--sm"
+              [disabled]="apptPage === 1"
+              (click)="apptGoToPage(apptPage - 1)">
+              ‹ Ant.
+            </button>
+            @for (p of apptPageNumbers(); track p) {
+              <button
+                [class]="'btn btn--sm ' + (p === apptPage ? 'btn--primary' : 'btn--ghost')"
+                (click)="apptGoToPage(p)">
+                {{ p }}
+              </button>
+            }
+            <button
+              class="btn btn--ghost btn--sm"
+              [disabled]="apptPage === apptResult()?.totalPages"
+              (click)="apptGoToPage(apptPage + 1)">
+              Sig. ›
+            </button>
+            <span class="text-muted admin-panel__pagination-info">
+              {{ apptResult()?.total }} turno(s) en total
+            </span>
+          </div>
+        }
+
+      }
+    </section>
+
+  }
+
+</div>
