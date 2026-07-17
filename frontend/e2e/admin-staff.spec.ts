@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { FIXTURES, login, logout } from './helpers';
+import { FIXTURES, login, logout, fillLoginForm } from './helpers';
 
 test.describe('Admin · Peluqueros', () => {
   test('alta, email duplicado, edición, des/reactivación y login de la cuenta nueva', async ({ page }) => {
@@ -48,8 +48,7 @@ test.describe('Admin · Peluqueros', () => {
     await expect(row).toHaveClass(/admin-panel__row--inactive/);
 
     await logout(page);
-    await page.fill('#email', email);
-    await page.fill('#password', password);
+    await fillLoginForm(page, email, password);
     await page.click('button[type=submit]');
     await expect(page.locator('.alert--error')).toHaveText(
       'Tu cuenta está desactivada. Contactá al administrador.',

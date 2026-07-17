@@ -22,6 +22,21 @@ export async function logout(page: Page): Promise<void> {
   await page.waitForURL('**/auth/login');
 }
 
+/**
+ * Tipea email/password en el form de login reintentando la carga completa.
+ * Tras un logout client-side, /auth/login se monta vía loadComponent (lazy);
+ * waitForURL resuelve apenas cambia la URL, antes de que el FormGroup del
+ * componente termine de bindearse — un fill() inmediato puede perderse.
+ */
+export async function fillLoginForm(page: Page, email: string, password: string): Promise<void> {
+  await expect(async () => {
+    await page.fill('#email', email);
+    await page.fill('#password', password);
+    expect(await page.inputValue('#email')).toBe(email);
+    expect(await page.inputValue('#password')).toBe(password);
+  }).toPass({ timeout: 5_000 });
+}
+
 export async function apiLogin(
   request: APIRequestContext,
   email: string,

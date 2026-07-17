@@ -19,8 +19,13 @@ test.describe('Reserva de turno (cliente)', () => {
     await page.locator('.book__option-card').first().click();
 
     // Paso 3: fecha — mañana, para no depender de la hora en que corre la suite
+    // (el selector de fecha es un calendario de botones, no un <input>)
     const tomorrow = dateOffset(1);
-    await page.fill('#appt-date', tomorrow);
+    const tomorrowDay = Number(tomorrow.slice(-2));
+    if (tomorrowDay < new Date().getDate()) {
+      await page.getByRole('button', { name: '›' }).click(); // "mañana" cae en el mes siguiente
+    }
+    await page.getByRole('button', { name: String(tomorrowDay), exact: true }).click();
 
     // Paso 4: horario — el primero disponible
     await page.waitForSelector('.book__slot', { timeout: 15_000 });
