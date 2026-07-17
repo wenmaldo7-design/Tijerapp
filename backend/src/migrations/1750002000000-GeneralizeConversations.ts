@@ -36,18 +36,18 @@ export class GeneralizeConversations1750002000000 implements MigrationInterface 
         MODIFY COLUMN \`participantBId\` int NOT NULL
     `);
 
-    // 5. Drop old unique index and add new one
-    await queryRunner.query(`DROP INDEX \`IDX_conversations_client_staff\` ON \`conversations\``);
-    await queryRunner.query(`
-      CREATE UNIQUE INDEX \`IDX_conversations_participants\`
-        ON \`conversations\` (\`participantAId\`, \`participantBId\`)
-    `);
-
-    // 6. Drop old FK constraints
+    // 5. Drop old FK constraints (must happen before dropping the index they depend on)
     await queryRunner.query(`
       ALTER TABLE \`conversations\`
         DROP FOREIGN KEY \`FK_conversations_clientId\`,
         DROP FOREIGN KEY \`FK_conversations_staffProfileId\`
+    `);
+
+    // 6. Drop old unique index and add new one
+    await queryRunner.query(`DROP INDEX \`IDX_conversations_client_staff\` ON \`conversations\``);
+    await queryRunner.query(`
+      CREATE UNIQUE INDEX \`IDX_conversations_participants\`
+        ON \`conversations\` (\`participantAId\`, \`participantBId\`)
     `);
 
     // 7. Drop old columns
